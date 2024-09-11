@@ -11,7 +11,7 @@ import { markdownToHTML } from '../../markdown/markdown-parser';
 const mentionSerializer = {
     mention: (state: MarkdownSerializerState, node: ProseMirrorNode) => {
         state.write(
-            `<limebb-mention limetype="${node.attrs.type}" objectid="${node.attrs.objectid}" descriptive="${node.attrs.descriptive}"></limebb-mention>`,
+            `<limebb-mention type="${node.attrs.type}" objectid="${node.attrs.objectid}" descriptive="${node.attrs.descriptive}"></limebb-mention>`,
         );
     },
 };
