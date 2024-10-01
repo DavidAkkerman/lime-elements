@@ -17,7 +17,7 @@ import { exampleSetup } from 'prosemirror-example-setup';
 import { keymap } from 'prosemirror-keymap';
 import { ActionBarItem } from 'src/components/action-bar/action-bar.types';
 import { ListSeparator } from 'src/components/list/list-item.types';
-import { MenuCommandFactory } from './menu/menu-commands';
+import { isExternalLink, MenuCommandFactory } from './menu/menu-commands';
 import { menuTranslationIDs, getTextEditorMenuItems } from './menu/menu-items';
 import { ContentTypeConverter } from '../utils/content-type-converter';
 import { markdownConverter } from '../utils/markdown-converter';
@@ -410,8 +410,26 @@ export class ProsemirrorAdapter {
     };
 
     private handleLinkChange = (event: CustomEvent<EditorTextLink>) => {
-        this.link = event.detail;
+        const { href } = event.detail;
+        const normalizedHref = this.normalizeExternalLink(href);
+
+        this.updateLink({
+            ...event.detail,
+            href: normalizedHref,
+        });
     };
+
+    private normalizeExternalLink = (href: string): string => {
+        if (isExternalLink(href) && !/^https?:\/\//i.test(href)) {
+            return `https://${href}`;
+        }
+
+        return href;
+    };
+
+    private updateLink = debounce((value: EditorTextLink) => {
+        this.link = value;
+    }, DEBOUNCE_TIMEOUT);
 
     public setFocus() {
         this.view?.focus();
