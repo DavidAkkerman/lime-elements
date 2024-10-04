@@ -17,7 +17,7 @@ import { exampleSetup } from 'prosemirror-example-setup';
 import { keymap } from 'prosemirror-keymap';
 import { ActionBarItem } from 'src/components/action-bar/action-bar.types';
 import { ListSeparator } from 'src/components/list/list-item.types';
-import { isExternalLink, MenuCommandFactory } from './menu/menu-commands';
+import { MenuCommandFactory } from './menu/menu-commands';
 import { menuTranslationIDs, getTextEditorMenuItems } from './menu/menu-items';
 import { ContentTypeConverter } from '../utils/content-type-converter';
 import { markdownConverter } from '../utils/markdown-converter';
@@ -40,6 +40,7 @@ import {
 import { createImageRemoverPlugin } from './plugins/image-remover-plugin';
 import { createMenuStateTrackingPlugin } from './plugins/menu-state-tracking-plugin';
 import { createActionBarInteractionPlugin } from './plugins/menu-action-interaction-plugin';
+import { getHref } from 'src/util/link-helper';
 
 const DEBOUNCE_TIMEOUT = 300;
 
@@ -411,20 +412,11 @@ export class ProsemirrorAdapter {
 
     private handleLinkChange = (event: CustomEvent<EditorTextLink>) => {
         const { href } = event.detail;
-        const normalizedHref = this.normalizeExternalLink(href);
 
         this.updateLink({
             ...event.detail,
-            href: normalizedHref,
+            href: getHref(href),
         });
-    };
-
-    private normalizeExternalLink = (href: string): string => {
-        if (isExternalLink(href) && !/^https?:\/\//i.test(href)) {
-            return `https://${href}`;
-        }
-
-        return href;
     };
 
     private updateLink = debounce((value: EditorTextLink) => {
