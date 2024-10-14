@@ -1,24 +1,26 @@
 import { Component, h, Host, State } from '@stencil/core';
 import { LimelSelectCustomEvent, Option } from '@limetech/lime-elements';
-import { chartItems } from './chart-items-negative-values';
+import { chartItems } from './chart-items-with-negative-values';
 
 /**
  * Multi-axis Charts
- * Not recommended to use the `maxValue` prop.
+ * Normally, charts visualize items in a positive range.
+ * However, there are cases where you want to visualize items that have both
+ * positive and negative `value`s.
  *
- * @sourceFile chart-items-negative-values.ts
+ * @sourceFile chart-items-with-negative-values.ts
  */
 @Component({
     tag: 'limel-example-chart-multi-axis',
     shadow: true,
     styleUrl: 'chart-resizable-container.scss',
 })
-export class ChartTypeBarMultiAxisExample {
+export class ChartTypeMultiAxisExample {
     @State()
     private orientation: 'landscape' | 'portrait' = 'landscape';
 
     @State()
-    private type: 'bar' | 'scatter' = 'bar';
+    private type: 'bar' | 'scatter' = 'scatter';
 
     private orientations: Option[] = [
         { text: 'landscape', value: 'landscape' },
@@ -32,8 +34,8 @@ export class ChartTypeBarMultiAxisExample {
 
     public render() {
         return (
-            <Host class="tall">
-                <h4>Temperature fluctuations past 24 hours</h4>
+            <Host class="large">
+                <h4>Temperature right now</h4>
                 <limel-chart
                     type={this.type}
                     items={chartItems}

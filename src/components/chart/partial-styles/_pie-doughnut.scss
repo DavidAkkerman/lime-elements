@@ -1,9 +1,9 @@
 :host(limel-chart[type='pie']),
 :host(limel-chart[type='doughnut']) {
-    display: block;
-    width: 100%;
-    min-height: 2rem;
-    min-width: 2rem;
+    table {
+        min-height: 2rem;
+        min-width: 2rem;
+    }
 
     .chart {
         position: relative;

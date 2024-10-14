@@ -1,6 +1,8 @@
 import { Component, h, Prop, Watch } from '@stencil/core';
-import { ChartItem } from './chart.types';
+import { Languages } from '../date-picker/date.types';
+import translate from '../../global/translations';
 import { createRandomString } from '../../util/random-string';
+import { ChartItem } from './chart.types';
 
 const PERCENT = 100;
 const DEFAULT_AXIS_INCREMENT = 10;
@@ -19,7 +21,9 @@ const DEFAULT_AXIS_INCREMENT = 10;
  * @exampleComponent limel-example-chart-type-pie
  * @exampleComponent limel-example-chart-type-gantt
  * @exampleComponent limel-example-chart-multi-axis
+ * @exampleComponent limel-example-chart-multi-axis-gantt
  * @exampleComponent limel-example-chart-styling
+ * @exampleComponent limel-example-chart-accessibility
  * @Beta
  */
 
@@ -29,6 +33,27 @@ const DEFAULT_AXIS_INCREMENT = 10;
     styleUrl: 'chart.scss',
 })
 export class Chart {
+    /**
+     * Defines the language for translations.
+     * Will translate the translatable strings on the components.
+     */
+    @Prop({ reflect: true })
+    public language: Languages = 'en';
+
+    /**
+     * Helps users of assistive technologies to understand
+     * the context of the chart, and what is being displayed.
+     */
+    @Prop({ reflect: true })
+    public accessibleLabel?: string;
+
+    /**
+     * Helps users of assistive technologies to understand
+     * what the items in the chart represent.
+     */
+    @Prop({ reflect: true })
+    public accessibleItemsLabel?: string;
+
     /**
      * List of items in the chart,
      * each representing a data point.
@@ -81,15 +106,32 @@ export class Chart {
     }
 
     public render() {
-        if (!this.items || this.items.length === 0) {
+        return (
+            <table>
+                {this.renderCaption()}
+                {this.renderTableHeader()}
+                {this.renderAxises()}
+                <tbody class="chart">{this.renderItems()}</tbody>
+            </table>
+        );
+    }
+
+    private renderCaption() {
+        if (!this.accessibleLabel) {
             return;
         }
 
+        return <caption>{this.accessibleLabel}</caption>;
+    }
+
+    private renderTableHeader() {
         return (
-            <div class="chart">
-                {this.renderAxises()}
-                {this.renderItems()}
-            </div>
+            <thead>
+                <tr>
+                    <th scope="col">{this.accessibleItemsLabel}</th>
+                    <th scope="col">{translate.get('value', this.language)}</th>
+                </tr>
+            </thead>
         );
     }
 
@@ -133,6 +175,10 @@ export class Chart {
     }
 
     private renderItems() {
+        if (!this.items || this.items.length === 0) {
+            return;
+        }
+
         const { minRange, totalRange } = this.rangeData;
 
         let cumulativeOffset = 0;
@@ -153,8 +199,8 @@ export class Chart {
                 cumulativeOffset += size;
             }
 
-            return [
-                <span
+            return (
+                <tr
                     style={{
                         '--limel-chart-item-color': item.color,
                         '--limel-chart-item-offset': `${offset}`,
@@ -164,23 +210,47 @@ export class Chart {
                     class={{
                         item: true,
                         'has-start-value': item.startValue !== undefined,
+                        'has-negative-value-only': item.value < 0,
                     }}
                     key={itemId}
                     id={itemId}
-                    // data-item-text={item.text}
                     tabIndex={0}
-                />,
-                this.renderTooltip(
-                    itemId,
-                    item.text,
-                    item.value,
-                    size,
-                    item.startValue,
-                    item.prefix,
-                    item.suffix,
-                ),
-            ];
+                >
+                    <th>{this.getItemText(item)}</th>
+                    <td>{this.getFormattedValue(item)}</td>
+                    {this.renderTooltip(
+                        itemId,
+                        this.getItemText(item),
+                        item.value,
+                        size,
+                        item.startValue,
+                        item.prefix,
+                        item.suffix,
+                    )}
+                </tr>
+            );
         });
+    }
+
+    private getFormattedValue({
+        value,
+        startValue,
+        prefix = '',
+        suffix = '',
+    }: {
+        value: number;
+        startValue?: number;
+        prefix?: string;
+        suffix?: string;
+    }): string {
+        const noStartValue = `${prefix}${value}${suffix}`;
+        const withStartValue = `${prefix}${startValue}${suffix} — ${prefix}${value}${suffix}`;
+
+        return startValue !== undefined ? withStartValue : noStartValue;
+    }
+
+    private getItemText(item: ChartItem): string {
+        return item.text;
     }
 
     private renderTooltip(
@@ -193,14 +263,16 @@ export class Chart {
         suffix: string = '',
     ) {
         const PERCENT_DECIMAL = 2;
-        const noStartValue = `${prefix}${value}${suffix}`;
-        const withStartValue = `${prefix}${startValue}${suffix} — ${prefix}${value}${suffix}`;
-        const formattedValue =
-            startValue !== undefined ? withStartValue : noStartValue;
+        const formattedValue = this.getFormattedValue({
+            value: value,
+            startValue: startValue,
+            prefix: prefix,
+            suffix: suffix,
+        });
 
         const tooltipProps: any = {
-            label: `${text}`,
-            helperLabel: `${formattedValue}`,
+            label: text,
+            helperLabel: formattedValue,
             elementId: itemId,
         };
 

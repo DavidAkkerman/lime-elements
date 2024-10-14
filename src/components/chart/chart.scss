@@ -1,3 +1,5 @@
+@use '../../style/mixins';
+
 /**
 * @prop --chart-background-color: Defines the background color of the chart. Defaults to `transparent` for _most_ chart types.
 * @prop --chart-axis-line-color: Defines color of the axis lines. Defaults to `--contrast-900`. Note that lines have opacity as well, and get opaque on hover.
@@ -5,21 +7,58 @@
 * @prop --chart-stacked-item-divider-color: Defines the color that visually separates stacked chart items, for example for a `stacked-bar` chart. Defaults to `rgb(var(--color-white), 0.6)`.
 */
 
+:host(limel-chart) {
+    --chart-axis-line-color: var(
+        --limel-chart-axis-line-color,
+        rgb(var(--contrast-900))
+    );
+    box-sizing: border-box;
+    isolation: isolate;
+
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: var(--limel-chart-padding);
+}
+
 *,
 *:before,
 *:after {
     box-sizing: border-box;
 }
 
-:host(limel-chart) {
-    --chart-axis-line-color: var(
-        --limel-chart-axis-line-color,
-        rgb(var(--contrast-900))
-    );
-    isolation: isolate;
+table {
+    all: unset;
+    border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+
     position: relative;
-    box-sizing: border-box;
-    padding: var(--limel-chart-padding);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    colgroup,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+        all: unset;
+    }
+
+    caption,
+    colgroup,
+    thead,
+    tfoot,
+    th,
+    td {
+        @include mixins.visually-hidden;
+    }
 }
 
 .chart {
@@ -27,6 +66,8 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
+    min-height: 0;
+    min-width: 0;
 
     &:has(.item:hover),
     &:has(.item:focus-visible) {
