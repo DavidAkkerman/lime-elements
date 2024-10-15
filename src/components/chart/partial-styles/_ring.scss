@@ -8,11 +8,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        overflow: hidden;
-        background-color: var(
-            --chart-background-color,
-            rgb(var(--contrast-200))
-        );
 
         aspect-ratio: 1;
         border-radius: 50%;
@@ -29,6 +24,14 @@
                 --limel-chart-background-color,
                 rgb(var(--contrast-200))
             );
+        }
+
+        &:has(.item:hover),
+        &:has(.item:focus-visible) {
+            .item {
+                opacity: 1;
+                filter: grayscale(1);
+            }
         }
     }
 
@@ -47,6 +50,8 @@
     }
 
     .item {
+        @include mixins.visualize-keyboard-focus;
+
         background: conic-gradient(
             var(--limel-chart-item-color) 0
                 calc(
@@ -64,5 +69,15 @@
             100% - var(--limel-chart-item-index) *
                 (100% / (var(--limel-chart-number-of-items) + 1))
         );
+
+        &:focus-visible,
+        &:hover {
+            filter: grayscale(0) !important;
+        }
+
+        &:first-child {
+            // I don't know why the first item is not 100% centered
+            margin-left: -1px;
+        }
     }
 }

@@ -23,13 +23,8 @@
     padding: var(--limel-chart-padding);
 }
 
-*,
-*:before,
-*:after {
-    box-sizing: border-box;
-}
-
 table {
+    // Since these are mainly "resets", no styles should be before them.
     all: unset;
     border-collapse: collapse;
     border-spacing: 0;
@@ -61,6 +56,12 @@ table {
     }
 }
 
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
 .chart {
     position: relative;
     flex-grow: 1;
@@ -80,6 +81,7 @@ table {
 .item {
     transition:
         background-color 0.2s ease,
+        filter 0.2s ease,
         opacity 0.4s ease;
     cursor: help;
 
