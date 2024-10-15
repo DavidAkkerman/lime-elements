@@ -108,6 +108,12 @@ export class Chart {
         totalRange: number;
     };
 
+    private cachedRange: {
+        minRange: number;
+        maxRange: number;
+        totalRange: number;
+    } | null = null;
+
     public componentWillLoad() {
         this.recalculateRangeData();
     }
@@ -191,40 +197,23 @@ export class Chart {
             return;
         }
 
-        const { minRange, totalRange } = this.rangeData;
-
         let cumulativeOffset = 0;
 
         return this.items.map((item, index) => {
             const itemId = createRandomString();
-
-            const normalizedStart =
-                (((item.startValue ?? 0) - minRange) / totalRange) * PERCENT;
-            const normalizedEnd =
-                ((item.value - minRange) / totalRange) * PERCENT;
-            const size = normalizedEnd - normalizedStart;
-
-            let offset = normalizedStart;
+            const { size, offset } = this.calculateSizeAndOffset(
+                item,
+                cumulativeOffset,
+            );
 
             if (this.type === 'pie' || this.type === 'doughnut') {
-                offset = cumulativeOffset;
                 cumulativeOffset += size;
             }
 
             return (
                 <tr
-                    style={{
-                        '--limel-chart-item-color': item.color,
-                        '--limel-chart-item-offset': `${offset}`,
-                        '--limel-chart-item-size': `${size}`,
-                        '--limel-chart-item-index': `${index}`,
-                    }}
-                    class={{
-                        item: true,
-                        'has-start-value': item.startValue !== undefined,
-                        'has-negative-value-only':
-                            item.value < 0 && !item.startValue,
-                    }}
+                    style={this.getItemStyle(item, index, size, offset)}
+                    class={this.getItemClass(item)}
                     key={itemId}
                     id={itemId}
                     tabIndex={0}
@@ -243,6 +232,44 @@ export class Chart {
                 </tr>
             );
         });
+    }
+
+    private getItemStyle(
+        item: ChartItem,
+        index: number,
+        size: number,
+        offset: number,
+    ) {
+        return {
+            '--limel-chart-item-color': item.color,
+            '--limel-chart-item-offset': `${offset}`,
+            '--limel-chart-item-size': `${size}`,
+            '--limel-chart-item-index': `${index}`,
+        };
+    }
+
+    private getItemClass(item: ChartItem) {
+        return {
+            item: true,
+            'has-start-value': item.startValue !== undefined,
+            'has-negative-value-only': item.value < 0 && !item.startValue,
+        };
+    }
+
+    private calculateSizeAndOffset(item: ChartItem, cumulativeOffset: number) {
+        const { minRange, totalRange } = this.rangeData;
+
+        const normalizedStart =
+            (((item.startValue ?? 0) - minRange) / totalRange) * PERCENT;
+        const normalizedEnd = ((item.value - minRange) / totalRange) * PERCENT;
+        const size = normalizedEnd - normalizedStart;
+
+        let offset = normalizedStart;
+        if (this.type === 'pie' || this.type === 'doughnut') {
+            offset = cumulativeOffset;
+        }
+
+        return { size: size, offset: offset };
     }
 
     private getFormattedValue({
@@ -304,6 +331,10 @@ export class Chart {
     }
 
     private calculateRange() {
+        if (this.cachedRange) {
+            return this.cachedRange;
+        }
+
         const minRange = Math.min(
             ...[].concat(
                 ...this.items.map((item) => [item.startValue ?? 0, item.value]),
@@ -315,49 +346,39 @@ export class Chart {
             ),
         );
 
-        // Calculate total sum of all item values for pie and doughnut charts
         const totalSum = this.items.reduce((sum, item) => sum + item.value, 0);
 
-        // Determine final max range based on chart type and maxValue prop
-        let finalMaxRange;
+        let finalMaxRange = this.maxValue ?? maxRange;
         if (
             (this.type === 'pie' || this.type === 'doughnut') &&
             !this.maxValue
         ) {
             finalMaxRange = totalSum;
-        } else {
-            finalMaxRange = this.maxValue ?? maxRange;
         }
 
-        // Adjust finalMaxRange to the nearest multiple of axisIncrement
+        // Adjust the final maxRange and minRange to the nearest multiple of axisIncrement
         const visualMaxRange =
             Math.ceil(finalMaxRange / this.axisIncrement) * this.axisIncrement;
-
-        // Adjust minRange to the nearest multiple of axisIncrement (this is the first axis line)
         const visualMinRange =
             Math.floor(minRange / this.axisIncrement) * this.axisIncrement;
 
         const totalRange = visualMaxRange - visualMinRange;
 
-        return {
-            minRange: visualMinRange, // Use visualMinRange for calculating the offset
-            maxRange: visualMaxRange, // Use visualMaxRange for alignment with axis lines
+        this.cachedRange = {
+            minRange: visualMinRange,
+            maxRange: visualMaxRange,
             totalRange: totalRange,
         };
+
+        return this.cachedRange;
     }
 
     @Watch('items')
-    handleItemsChange() {
-        this.recalculateRangeData();
-    }
-
-    @Watch('range')
-    handleRangeChange() {
-        this.recalculateRangeData();
-    }
-
     @Watch('axisIncrement')
-    handleAxisIncrementChange() {
+    @Watch('maxValue')
+    handleChange() {
+        // Invalidate the cached range whenever relevant props change
+        this.cachedRange = null;
         this.recalculateRangeData();
     }
 
