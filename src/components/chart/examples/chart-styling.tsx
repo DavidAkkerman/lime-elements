@@ -4,7 +4,7 @@ import { chartItems } from './chart-items-gantt-negative-values';
 /**
  * Styling
  *
- * @sourceFile chart-items-stack.ts
+ * @sourceFile chart-items-gantt-negative-values.ts
  */
 @Component({
     tag: 'limel-example-chart-styling',

@@ -6,13 +6,10 @@
     }
 
     .chart {
-        position: relative;
-        justify-content: center;
-        align-items: center;
         overflow: hidden;
         background-color: var(
             --chart-background-color,
-            rgb(var(--contrast-800), 0.2)
+            rgb(var(--contrast-200))
         );
 
         aspect-ratio: 1;

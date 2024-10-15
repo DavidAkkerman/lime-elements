@@ -20,7 +20,11 @@ import { chartItems } from './chart-items-gantt-negative-values';
  * they will be presented to assistive technologies, such as screen readers
  * as well as search engines.
  *
- * @sourceFile chart-items-negative-values.ts
+ * Another way to improve the accessibility of the chart is to use
+ * the `prefix` and `suffix` props to provide additional context to the `value`
+ * of each item.
+ *
+ * @sourceFile chart-items-gantt-negative-values.ts
  */
 @Component({
     tag: 'limel-example-chart-accessibility',
@@ -30,10 +34,10 @@ import { chartItems } from './chart-items-gantt-negative-values';
 export class ChartAccessibilityExample {
     public render() {
         const heading = 'Temperature fluctuations past 24 hours';
-        const subHeading = 'in our offices around the world';
+        const subHeading = 'in cities we have our offices';
 
         return (
-            <Host class="tall">
+            <Host class="large">
                 <limel-header
                     heading={heading}
                     subheading={subHeading}

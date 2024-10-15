@@ -19,6 +19,7 @@ const DEFAULT_AXIS_INCREMENT = 10;
  * @exampleComponent limel-example-chart-type-scatter
  * @exampleComponent limel-example-chart-type-doughnut
  * @exampleComponent limel-example-chart-type-pie
+ * @exampleComponent limel-example-chart-type-ring
  * @exampleComponent limel-example-chart-type-gantt
  * @exampleComponent limel-example-chart-multi-axis
  * @exampleComponent limel-example-chart-multi-axis-gantt
@@ -65,8 +66,13 @@ export class Chart {
      * Defines how items are visualized in the chart.
      */
     @Prop({ reflect: true })
-    public type?: 'bar' | 'stacked-bar' | 'pie' | 'doughnut' | 'scatter' =
-        'stacked-bar';
+    public type?:
+        | 'bar'
+        | 'stacked-bar'
+        | 'pie'
+        | 'doughnut'
+        | 'scatter'
+        | 'ring' = 'stacked-bar';
 
     /**
      * Defines whether the chart is intended to be displayed wide or tall.
@@ -107,7 +113,12 @@ export class Chart {
 
     public render() {
         return (
-            <table>
+            <table
+                style={{
+                    '--limel-chart-number-of-items':
+                        this.items.length.toString(),
+                }}
+            >
                 {this.renderCaption()}
                 {this.renderTableHeader()}
                 {this.renderAxises()}
@@ -205,12 +216,13 @@ export class Chart {
                         '--limel-chart-item-color': item.color,
                         '--limel-chart-item-offset': `${offset}`,
                         '--limel-chart-item-size': `${size}`,
-                        '--limel-chart-item-index': `${index + 1}`,
+                        '--limel-chart-item-index': `${index}`,
                     }}
                     class={{
                         item: true,
                         'has-start-value': item.startValue !== undefined,
-                        'has-negative-value-only': item.value < 0,
+                        'has-negative-value-only':
+                            item.value < 0 && !item.startValue,
                     }}
                     key={itemId}
                     id={itemId}

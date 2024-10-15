@@ -82,7 +82,6 @@ table {
         background-color 0.2s ease,
         opacity 0.4s ease;
     cursor: help;
-    mix-blend-mode: hard-light;
 
     &:focus-visible,
     &:hover {
@@ -92,5 +91,6 @@ table {
 
 @import './partial-styles/_bar-gantt-scatter';
 @import './partial-styles/_pie-doughnut';
+@import './partial-styles/_ring';
 @import './partial-styles/_stacked-bar';
 @import './partial-styles/_axises';

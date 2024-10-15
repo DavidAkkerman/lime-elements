@@ -26,6 +26,8 @@ $min-item-size: 0.5rem;
 
     .item {
         @include mixins.visualize-keyboard-focus;
+        mix-blend-mode: hard-light;
+
         display: flex;
         align-items: center;
         justify-content: center;
