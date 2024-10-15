@@ -23,6 +23,7 @@ const DEFAULT_AXIS_INCREMENT = 10;
  * @exampleComponent limel-example-chart-type-gantt
  * @exampleComponent limel-example-chart-multi-axis
  * @exampleComponent limel-example-chart-multi-axis-gantt
+ * @exampleComponent limel-example-chart-axis-increment
  * @exampleComponent limel-example-chart-styling
  * @exampleComponent limel-example-chart-accessibility
  * @Beta
@@ -352,6 +353,11 @@ export class Chart {
 
     @Watch('range')
     handleRangeChange() {
+        this.recalculateRangeData();
+    }
+
+    @Watch('axisIncrement')
+    handleAxisIncrementChange() {
         this.recalculateRangeData();
     }
 
