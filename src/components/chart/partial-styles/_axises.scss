@@ -37,7 +37,6 @@
 :host(limel-chart[orientation='landscape']) {
     .axises {
         flex-direction: column-reverse;
-        // transform: translateY(0.5px);
     }
     .axis-line {
         border-bottom: 1px solid;
@@ -53,7 +52,6 @@
 :host(limel-chart[orientation='portrait']) {
     .axises {
         flex-direction: row;
-        // transform: translateX(-0.5px);
     }
     .axis-line {
         border-left: 1px solid;

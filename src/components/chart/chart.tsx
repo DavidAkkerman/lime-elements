@@ -99,12 +99,6 @@ export class Chart {
     @Prop({ reflect: true })
     public axisIncrement?: number = DEFAULT_AXIS_INCREMENT;
 
-    /**
-     *
-     */
-    @Prop({ reflect: true })
-    public legend?: boolean = true;
-
     private rangeData: {
         minRange: number;
         maxRange: number;
@@ -285,7 +279,7 @@ export class Chart {
         }
 
         if (this.type === 'pie' || this.type === 'doughnut') {
-            return cumulativeOffset; // For pie/doughnut charts, offset depends on cumulativeOffset
+            return cumulativeOffset;
         }
 
         const { minRange, totalRange } = this.rangeData;
@@ -422,7 +416,6 @@ export class Chart {
             finalMaxRange = totalSum;
         }
 
-        // Adjust the final maxRange and minRange to the nearest multiple of axisIncrement
         const visualMaxRange =
             Math.ceil(finalMaxRange / this.axisIncrement) * this.axisIncrement;
         const visualMinRange =

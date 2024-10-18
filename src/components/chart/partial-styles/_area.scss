@@ -36,12 +36,6 @@
                 ),
             100% calc((100 - var(--limel-chart-next-item-offset)) * 1%)
         );
-
-        // &.has-negative-value-only {
-        //     // DO WE NEED THIS?
-        //     transform-origin: bottom;
-        //     transform: rotateX(180deg);
-        // }
     }
 }
 
@@ -66,10 +60,5 @@
                 100%,
             calc(var(--limel-chart-next-item-offset) * 1%) 100%
         );
-
-        // &.has-negative-value-only {
-        //     transform-origin: left;
-        //     transform: rotateY(180deg);
-        // }
     }
 }
