@@ -1,5 +1,5 @@
 import { Component, h } from '@stencil/core';
-import { chartItems } from './chart-items-gantt-negative-values';
+import { chartItems } from './chart-items-multi-axis-negative-start-values';
 
 /**
  * Styling

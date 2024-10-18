@@ -17,12 +17,14 @@ const DEFAULT_AXIS_INCREMENT = 10;
  * @exampleComponent limel-example-chart-max-value
  * @exampleComponent limel-example-chart-type-bar
  * @exampleComponent limel-example-chart-type-scatter
+ * @exampleComponent limel-example-chart-type-area
  * @exampleComponent limel-example-chart-type-doughnut
  * @exampleComponent limel-example-chart-type-pie
  * @exampleComponent limel-example-chart-type-ring
  * @exampleComponent limel-example-chart-type-gantt
  * @exampleComponent limel-example-chart-multi-axis
- * @exampleComponent limel-example-chart-multi-axis-gantt
+ * @exampleComponent limel-example-chart-multi-axis-with-negative-start-values
+ * @exampleComponent limel-example-chart-multi-axis-area-with-negative-start-values
  * @exampleComponent limel-example-chart-axis-increment
  * @exampleComponent limel-example-chart-styling
  * @exampleComponent limel-example-chart-accessibility
@@ -73,7 +75,8 @@ export class Chart {
         | 'pie'
         | 'doughnut'
         | 'scatter'
-        | 'ring' = 'stacked-bar';
+        | 'ring'
+        | 'area' = 'stacked-bar';
 
     /**
      * Defines whether the chart is intended to be displayed wide or tall.
@@ -154,7 +157,11 @@ export class Chart {
     }
 
     private renderAxises() {
-        if (this.type !== 'bar' && this.type !== 'scatter') {
+        if (
+            this.type !== 'bar' &&
+            this.type !== 'scatter' &&
+            this.type !== 'area'
+        ) {
             return;
         }
 
@@ -197,6 +204,8 @@ export class Chart {
             return;
         }
 
+        const { minRange, totalRange } = this.rangeData;
+
         let cumulativeOffset = 0;
 
         return this.items.map((item, index) => {
@@ -210,9 +219,26 @@ export class Chart {
                 cumulativeOffset += size;
             }
 
+            const nextItemSize = this.getNextItemSize(
+                index,
+                minRange,
+                totalRange,
+            );
+            const nextItemOffset = this.getNextItemOffset(
+                index,
+                cumulativeOffset,
+            );
+
             return (
                 <tr
-                    style={this.getItemStyle(item, index, size, offset)}
+                    style={this.getItemStyle(
+                        item,
+                        index,
+                        size,
+                        offset,
+                        nextItemSize,
+                        nextItemOffset,
+                    )}
                     class={this.getItemClass(item)}
                     key={itemId}
                     id={itemId}
@@ -234,17 +260,57 @@ export class Chart {
         });
     }
 
+    private getNextItemSize(
+        index: number,
+        minRange: number,
+        totalRange: number,
+    ): number {
+        const nextItem = this.items[index + 1];
+        if (!nextItem) {
+            return 0;
+        }
+
+        const nextNormalizedEnd =
+            ((nextItem.value - minRange) / totalRange) * PERCENT;
+        const nextNormalizedStart =
+            (((nextItem.startValue ?? 0) - minRange) / totalRange) * PERCENT;
+
+        return nextNormalizedEnd - nextNormalizedStart;
+    }
+
+    private getNextItemOffset(index: number, cumulativeOffset: number): number {
+        const nextItem = this.items[index + 1];
+        if (!nextItem) {
+            return 0;
+        }
+
+        if (this.type === 'pie' || this.type === 'doughnut') {
+            return cumulativeOffset; // For pie/doughnut charts, offset depends on cumulativeOffset
+        }
+
+        const { minRange, totalRange } = this.rangeData;
+
+        const nextNormalizedStart =
+            (((nextItem.startValue ?? 0) - minRange) / totalRange) * PERCENT;
+
+        return nextNormalizedStart;
+    }
+
     private getItemStyle(
         item: ChartItem,
         index: number,
         size: number,
         offset: number,
+        nextItemSize: number,
+        nextItemOffset: number,
     ) {
         return {
             '--limel-chart-item-color': item.color,
             '--limel-chart-item-offset': `${offset}`,
             '--limel-chart-item-size': `${size}`,
             '--limel-chart-item-index': `${index}`,
+            '--limel-chart-next-item-size': `${nextItemSize}`,
+            '--limel-chart-next-item-offset': `${nextItemOffset}`,
         };
     }
 
@@ -377,7 +443,6 @@ export class Chart {
     @Watch('axisIncrement')
     @Watch('maxValue')
     handleChange() {
-        // Invalidate the cached range whenever relevant props change
         this.cachedRange = null;
         this.recalculateRangeData();
     }

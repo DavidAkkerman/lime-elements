@@ -1,31 +1,32 @@
 import { Component, h, Host, State } from '@stencil/core';
 import { LimelSelectCustomEvent, Option } from '@limetech/lime-elements';
-import { chartItems } from './chart-items-multi-axis-negative-start-values';
+import { chartItems } from './chart-items-multi-axis-negative-start-values-area';
 
 /**
- * Multi-axis with negative `startValue`s
- * You can also get a multi-axis chart with items in your dataset
- * that have both `startValue` and `value`. Just make sure that
+ * Multi-axis Area Chart with Negative `startValue`s
+ * You can also get a multi-axis Area chart, by making sure that
  * each item's `startValue` is smaller than its `value`.
  *
  * :::important
- * Using the `maxValue` prop does not work well for these types of charts,
- * and thus not recommended.
+ * For Multi-axis Area charts to render correctly,
+ * you cannot have items that only have negative `value`s.
+ * You must make sure to have both `startValue` and
+ * `value` for all items in your dataset.
  * :::
  *
- * @sourceFile chart-items-multi-axis-negative-start-values.ts
+ * @sourceFile chart-items-multi-axis-negative-start-values-area.ts
  */
 @Component({
-    tag: 'limel-example-chart-multi-axis-with-negative-start-values',
+    tag: 'limel-example-chart-multi-axis-area-with-negative-start-values',
     shadow: true,
     styleUrl: 'chart-resizable-container.scss',
 })
-export class ChartMultiAxisWithNegativeStartValuesExample {
+export class ChartMultiAxisAreaWithNegativeStartValuesExample {
     @State()
     private orientation: 'landscape' | 'portrait' = 'landscape';
 
     @State()
-    private type: 'bar' | 'scatter' = 'bar';
+    private type: 'area' | 'scatter' = 'area';
 
     private orientations: Option[] = [
         { text: 'landscape', value: 'landscape' },
@@ -33,7 +34,7 @@ export class ChartMultiAxisWithNegativeStartValuesExample {
     ];
 
     private types: Option[] = [
-        { text: 'Bar', value: 'bar' },
+        { text: 'Area', value: 'area' },
         { text: 'Scatter', value: 'scatter' },
     ];
 
@@ -83,6 +84,6 @@ export class ChartMultiAxisWithNegativeStartValuesExample {
     private handleTypeChange = (
         event: LimelSelectCustomEvent<Option<string>>,
     ) => {
-        this.type = event.detail.value as 'bar' | 'scatter';
+        this.type = event.detail.value as 'area' | 'scatter';
     };
 }
