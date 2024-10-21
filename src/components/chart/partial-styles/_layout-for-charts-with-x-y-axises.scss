@@ -1,5 +1,6 @@
 :host(limel-chart[type='bar']),
 :host(limel-chart[type='scatter']),
+:host(limel-chart[type='line']),
 :host(limel-chart[type='area']) {
     .chart {
         display: flex;
@@ -15,6 +16,7 @@
 
 :host(limel-chart[type='bar'][orientation='landscape']),
 :host(limel-chart[type='scatter'][orientation='landscape']),
+:host(limel-chart[type='line'][orientation='landscape']),
 :host(limel-chart[type='area'][orientation='landscape']) {
     --limel-chart-padding: 0.5rem 0.5rem 0.5rem 2rem;
 
@@ -33,6 +35,7 @@
 
 :host(limel-chart[type='bar'][orientation='portrait']),
 :host(limel-chart[type='scatter'][orientation='portrait']),
+:host(limel-chart[type='line'][orientation='portrait']),
 :host(limel-chart[type='area'][orientation='portrait']) {
     --limel-chart-padding: 0.5rem 0.5rem 1rem 0.5rem;
 

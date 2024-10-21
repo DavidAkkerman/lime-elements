@@ -76,7 +76,8 @@ export class Chart {
         | 'doughnut'
         | 'scatter'
         | 'ring'
-        | 'area' = 'stacked-bar';
+        | 'area'
+        | 'line' = 'stacked-bar';
 
     /**
      * Defines whether the chart is intended to be displayed wide or tall.
